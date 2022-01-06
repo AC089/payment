@@ -1,0 +1,53 @@
+logging:
+  serverName: payment
+  level: Debug
+  maxRemain: 336
+  rotationTime: 1
+  path: runtime/log
+
+http_server:
+  port: 80
+  pem_path: config/cert/http/server.pem
+  key_path: config/cert/http/server.key
+  readTimeout: 60
+  writeTimeout: 60
+  runMode: debug
+
+grpc_server: 
+  port: 52898
+  pem_path: config/cert/grpc/server.pem
+  key_path: config/cert/grpc/server.key
+
+mysql:
+  host: 192.168.100.201
+  port: 3306
+  username: game
+  password: Game@123
+  dbname: payment
+  maxIdle: 10
+  maxOpen: 200
+  maxLifetime: 30
+
+redis:
+  host: 192.168.100.201
+  port: 6385
+  password: defaultpass
+  db: 15
+  dialTimeout: #拨打超时以建立新的连接,默认值为5秒
+  readTimeout: #套接字读取超时。如果达到，命令将失败,并带有超时而不是阻塞。使用值-1表示没有超时，使用0表示默认值。//默认值为3秒。
+  writeTimeout: #套接字写入超时。如果达到，命令将失败,并带有超时而不是阻塞。默认值为ReadTimeout。
+  poolSize: #套接字连接的最大数量,默认值是运行时报告的每个CPU 10个连接数
+  minIdleConns: #空闲连接的最小数量，这在建立新连接缓慢时很有用。
+  maxConnAge: #客户端退出（关闭）连接的连接年龄。默认是不关闭老化的连接
+  poolTimeout: #如果所有连接都忙//在返回错误之前客户端等待连接的时间。默认值为ReadTimeout + 1秒
+
+pprof: 
+  port: 6060
+
+worker: 
+  workerId: 1024
+
+nsq: 
+  nsq_url: 192.168.100.201:4150
+  timeout: 5
+  topic_pre: payment-dev

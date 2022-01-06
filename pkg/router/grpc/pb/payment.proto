@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package pb;
+
+//option go_package = "pkg/router/grpc/pb";
+
+service Greeter {
+  rpc Pay (PayRequest) returns (PayReply) {}
+  rpc Ack (AckRequest) returns (AckReply) {}
+}
+
+//pay接口请求参数
+message PayRequest {
+  string payAppCode = 1; //app唯一代号
+  string ServerId = 2; //发起支付服务id
+  uint64 AccountId = 3; //账户ID
+  PayChannelEnum PayChannel = 4; //支付渠道(1:alipay-app 2:alipay-h5 3:wechat-app 4:wechat-h5 5:iosPaid)
+  int64 TimeExpire = 5; //订单失效时间(时间戳)
+  uint64 Amount = 6; //支付金额
+  string Description = 7; //商品描述
+  string ClientIp = 8; //客户端ip
+  string Device = 9; //设备标识
+}
+
+
+// 支付渠道枚举
+enum PayChannelEnum {
+  UNKNOWN = 0; //未知类型
+  ALIPAY_APP = 1; //支付宝APP
+	ALIPAY_H5 = 2; //支付宝H5
+	WECHAT_APP = 3; //微信支付APP
+	WECHAT_H5 = 4; //微信支付H5
+	IOSPAID = 5; //IOS内购
+}
+
+// 支付回调ACK枚举
+enum AckEnum {
+  FAIL = 0; //业务执行错误，需要执行回滚退款
+  SUCCESS = 1; //业务执行成功
+}
+
+//pay接口相应参数
+message PayReply {
+  int32 Code = 1;    // 错误码
+	string CodeMsg = 2; // 错误信息,无错误时为空
+  string body = 3; //返回数据
+  //string sign = 4; //参数签名
+}
+
+//Ack回调请求参数
+message AckRequest {
+  string payAppCode = 1; //app唯一代号
+  uint64 OutTradeNo = 2; //订单号
+  AckEnum AckCode = 3; //Ack回调码 0-业务执行错误，需要执行回滚退款 1-业务执行成功
+}
+
+//Ack回调返回数据
+message AckReply {
+  int32 Code = 1;    // 错误码
+	string CodeMsg = 2; // 错误信息,无错误时为空
+}

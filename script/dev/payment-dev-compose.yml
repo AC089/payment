@@ -1,0 +1,25 @@
+version: '3'
+services:
+  payment-dev:
+    image: centos:7
+    container_name: payment-dev
+    environment:
+      - "ENV=dev"
+    hostname: payment
+    ports:
+      - 80:80  
+      - 52898:52898
+      - 6060:6060  
+    networks:
+      - payment-network
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/config:/app/config
+      - ${PWD}/runtime:/app/runtime
+      - ${PWD}/cmd:/app/cmd
+      - /usr/share/fonts:/usr/share/fonts
+    working_dir: /app/
+    command: /app/cmd/payment
+networks:
+  payment-network:
+    external: true

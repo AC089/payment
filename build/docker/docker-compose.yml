@@ -1,0 +1,85 @@
+version: '3'
+services:
+    mysql:
+        image: mysql:5.7.16
+        container_name: mysql
+        hostname: mysql
+        restart: always
+        ports:
+            - 3306:3306
+        volumes:
+            - /etc/localtime:/etc/localtime
+            - /mnt/d/docker-infra/mysql/data:/var/lib/mysql
+        env_file:
+            .env
+        environment:
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_USER: 'game'
+            MYSQL_PASS: 'Game@123'
+    nsqlookupd:
+        image: nsqio/nsq:v1.2.0
+        container_name: nsqlookupd
+        hostname: nsqlookupd
+        environment:
+        - "SERVICE_NAME=nsqlookupd"
+        restart: always
+        ports:
+        - 4160:4160
+        - 4161:4161
+        command: /nsqlookupd
+    nsqd1:
+        image: nsqio/nsq:v1.2.0
+        container_name: nsqd1
+        hostname: nsqd1
+        environment:
+        - "SERVICE_NAME=nsqd"
+        restart: always
+        ports:
+        - 4150:4150
+        - 4151:4151
+        volumes:
+        - /etc/localtime:/etc/localtime
+        - /mnt/d/docker-infra/nsq/data/1:/data
+        depends_on:
+        - nsqlookupd
+        command: /nsqd --data-path=/data --mem-queue-size=0 --lookupd-tcp-address=nsqlookupd:4160 --tcp-address=nsqd1:4150 --http-address=nsqd1:4151
+    nsqd2:
+        image: nsqio/nsq:v1.2.0
+        container_name: nsqd2
+        hostname: nsqd2
+        environment:
+        - "SERVICE_NAME=nsqd"
+        restart: always
+        ports:
+        - 4150
+        - 4151
+        volumes:
+        - /etc/localtime:/etc/localtime
+        - /mnt/d/docker-infra/nsq/data/2:/data
+        depends_on:
+        - nsqlookupd
+        command: /nsqd --data-path=/data --lookupd-tcp-address=nsqlookupd:4160 --tcp-address=nsqd2:4150 --http-address=nsqd2:4151
+    nsqadmin:
+        image: nsqio/nsq:v1.2.0
+        container_name: nsqadmin
+        hostname: nsqadmin
+        environment:
+        - "SERVICE_NAME=nsqadmin"
+        restart: always
+        ports:
+        - 4170:4170
+        depends_on:
+        - nsqlookupd
+        command: /nsqadmin --lookupd-http-address=nsqlookupd:4161 --http-address=nsqadmin:4170
+    redis:
+        image: redis:5.0.7
+        container_name: redis
+        hostname: redis
+        restart: always
+        ports:
+        - 6379:6379
+        volumes:
+        - /etc/localtime:/etc/localtime
+        - /mnt/d/docker-infra/redis/redis.conf:/etc/redis/redis.conf
+        - /mnt/d/docker-infra/redis/data:/data
+        command: redis-server /etc/redis/redis.conf

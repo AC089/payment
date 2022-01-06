@@ -1,0 +1,23 @@
+version: '3'
+services:
+  payment-test:
+    image: payment-test:latest
+    container_name: payment-test
+    environment:
+      - "ENV=test"
+    hostname: payment
+    ports:
+      - 80:80  
+      - 52898:52898
+      - 6060:6060  
+    networks:
+      - payment-network
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ${PWD}/runtime:/app/runtime
+      - /usr/share/fonts:/usr/share/fonts
+    # working_dir: /app/
+    # command: /app/cmd/payment
+networks:
+  payment-network:
+    external: true
